@@ -376,3 +376,24 @@ table.costs a{color:#6E5826;font-size:.72rem;letter-spacing:.06em;text-transform
 .campuscard .kv{display:grid;gap:.5rem;margin:.9rem 0}
 .campuscard .kv b{display:block;font:600 .62rem/1 var(--font-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.15rem}
 .campuscard .kv span{color:var(--ink-2);font-size:.92rem}
+
+/* store 2.0 — bag + membership tiers (2026-08-19) */
+.bagpill{position:fixed;right:1.1rem;bottom:4.6rem;z-index:80;background:var(--gold);color:#141416;border:0;border-radius:999px;padding:.7rem 1.15rem;font:600 .8rem/1 var(--font-ui);letter-spacing:.06em;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+.bagpill .bagcount{background:#141416;color:var(--gold);border-radius:999px;padding:.15rem .5rem;margin-left:.4rem}
+.bagdrawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);z-index:120;background:#141416;border-left:1px solid var(--gold-dim);padding:1.6rem;transform:translateX(105%);transition:transform .25s ease;overflow:auto}
+.bagdrawer.on{transform:none}
+.bagdrawer h2{color:var(--gold);font-size:1.3rem;margin-bottom:.4rem}
+.bagrow{border-bottom:1px solid var(--line);padding:.8rem 0;font-size:.9rem;color:var(--ink-2)}
+.bagrow b{color:var(--ink);display:block;margin-bottom:.25rem}
+.bagrow a{color:var(--gold-hi)} .bagrm{background:none;border:1px solid var(--line);color:var(--ink-3);border-radius:2px;padding:.2rem .55rem;margin-left:.6rem;cursor:pointer;font-size:.7rem}
+.bagclose{position:absolute;top:1rem;right:1rem;background:none;border:1px solid var(--line);color:var(--ink-2);border-radius:2px;padding:.35rem .8rem;cursor:pointer}
+.bagnote{font-size:.78rem;color:var(--ink-3);margin:.6rem 0 1rem}
+.sku .skuacts{display:flex;gap:.55rem;margin-top:.6rem;flex-wrap:wrap}
+.sku .addbag{background:none;border:1px solid var(--gold-dim);color:var(--gold);border-radius:2px;padding:.45rem .8rem;font:600 .68rem/1 var(--font-ui);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.sku .addbag:hover{border-color:var(--gold)}
+.tiergrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem;align-items:stretch}
+.tiercard{background:#FCF8EE;border:1px solid #E2D8C2;border-radius:2px;padding:2rem;display:flex;flex-direction:column;gap:.7rem}
+.tiercard h3{font-family:var(--font-d);font-size:1.7rem;color:#191713}
+.tiercard .tierline{color:#4a4436;font-size:.95rem;line-height:1.6}
+.tiercard .btn{margin-top:auto}
+.fenwickband{border:1px solid var(--br,#C98A8A);border-radius:var(--radius);padding:1.8rem;background:rgba(20,20,22,.03)}
