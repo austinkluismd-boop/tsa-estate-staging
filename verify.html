@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Verification console — staging</title>
+<style>
+body{background:#0B0B0C;color:#F4F1E9;font:15px/1.6 -apple-system,system-ui,sans-serif;margin:0;padding:2rem}
+h1{font-weight:600;font-size:1.3rem;color:#C8A45C} h2{font-size:1rem;color:#C8A45C;margin:1.6rem 0 .5rem}
+table{border-collapse:collapse;width:100%;font-size:.85rem} td,th{border-bottom:1px solid #2A2A2E;padding:.35rem .6rem;text-align:left;vertical-align:top}
+.ok{color:#7dc98f;font-weight:600}.bad{color:#e77;font-weight:600}.mono{font-family:ui-monospace,monospace;font-size:.8rem;color:#C9C5B9}
+#sum{font-size:1.05rem;margin:.8rem 0;padding:.8rem 1rem;border:1px solid #2A2A2E;border-radius:4px}
+button{background:#C8A45C;color:#141416;border:0;padding:.6rem 1.2rem;border-radius:2px;font-weight:600;cursor:pointer}
+progress{width:100%;height:6px}
+</style></head><body>
+<h1>Independent verification console</h1>
+<p>This page runs in <b>your</b> browser against the <b>live</b> copy of the site. It fetches every page,
+extracts every internal link and anchor, and re-fetches each target — nothing is taken on trust.
+Patient-photo bytes are additionally verified: each image file's SHA-256 is recomputed in-browser
+and compared to the hash embedded in its own filename.</p>
+<button id="run">Run full verification</button>
+<div id="sum"></div><progress id="pg" value="0" max="1" hidden></progress>
+<h2>Pages</h2><table id="pages"><tr><th>Page</th><th>HTTP</th><th>Internal links</th><th>Anchors</th><th>Result</th></tr></table>
+<h2>Broken references (must be empty)</h2><table id="broken"><tr><th>Found on</th><th>Reference</th><th>Problem</th></tr></table>
+<h2>Asset integrity (sha256-named images)</h2><table id="assets"><tr><th>File</th><th>Recomputed SHA-256 (first 12)</th><th>Match</th></tr></table>
+<script>
+const PAGES=["index.html","surgeons.html","fellowship.html","library.html","gallery.html","pricing.html",
+"rhinoplasty.html","medspa.html","wellness.html","store.html","contact.html","oklahoma-city.html",
+"privacy.html","accessibility.html","404.html","osa/index.html"];
+const $=s=>document.querySelector(s);
+function row(t,cells,cls){const tr=document.createElement('tr');cells.forEach((c,i)=>{const td=document.createElement('td');td.innerHTML=c;if(cls&&i===cells.length-1)td.className=cls;tr.appendChild(td)});$(t).appendChild(tr)}
+async function sha256hex(buf){const h=await crypto.subtle.digest('SHA-256',buf);return[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+$('#run').onclick=async()=>{
+ $('#run').disabled=true;$('#pg').hidden=false;
+ const ids={},docs={},broken=[];let done=0;
+ const baseURL=new URL('.',location.href);            /* works at domain root AND repo subpaths */
+ const pageURL=p=>new URL(p,baseURL);
+ for(const p of PAGES){
+   try{const r=await fetch(pageURL(p),{cache:'no-store'});const t=await r.text();docs[p]={status:r.status,text:t};
+     ids[p]=new Set([...t.matchAll(/id="([^"]+)"/g)].map(m=>m[1]));
+   }catch(e){docs[p]={status:'ERR '+e,text:''};ids[p]=new Set()}
+   $('#pg').value=(++done)/(PAGES.length*2);
+ }
+ let totalLinks=0,totalAnchors=0;
+ for(const p of PAGES){
+   const {status,text}=docs[p];
+   let nl=0,na=0;
+   for(const m of text.matchAll(/(?:href|src)="([^"]+)"/g)){
+     const u=m[1];
+     if(/^(https?:|tel:|sms:|mailto:|data:)/.test(u))continue;
+     if(u.startsWith('#')){na++;totalAnchors++;if(u!=='#'&&!ids[p].has(u.slice(1)))broken.push([p,u,'missing anchor on same page']);continue}
+     nl++;totalLinks++;
+     const[path,frag]=u.split('#');
+     const abs=new URL(path,pageURL(p));
+     const key=PAGES.find(x=>pageURL(x).pathname===abs.pathname);
+     if(key){if(frag&&!ids[key].has(frag))broken.push([p,u,'missing anchor on target']);}
+     else{try{const r=await fetch(abs,{method:'GET',cache:'no-store'});if(!r.ok)broken.push([p,u,'HTTP '+r.status])}catch(e){broken.push([p,u,'fetch failed'])}}
+   }
+   const okp=(status===200||status==='200'||status===304);
+   row('#pages',[p,String(status),String(nl),String(na),okp?'PASS':'FAIL'],okp?'ok':'bad');
+   $('#pg').value=(++done)/(PAGES.length*2);
+ }
+ const shas=new Set();
+ for(const p of PAGES)for(const m of docs[p].text.matchAll(/assets\/img\/([0-9a-f]{12})\.(jpg|png|webp)/g))shas.add(m[1]+'.'+m[2]);
+ let assetFail=0;
+ for(const f of [...shas].sort()){
+   try{const buf=await(await fetch(new URL('assets/img/'+f,baseURL),{cache:'no-store'})).arrayBuffer();
+     const h=(await sha256hex(buf)).slice(0,12);const ok=h===f.slice(0,12);if(!ok)assetFail++;
+     row('#assets',['assets/img/'+f,'<span class="mono">'+h+'</span>',ok?'MATCH':'MISMATCH'],ok?'ok':'bad');
+   }catch(e){assetFail++;row('#assets',['assets/img/'+f,'fetch failed','FAIL'],'bad')}
+ }
+ if(broken.length===0)row('#broken',['—','—','none'],'ok');else broken.forEach(b=>row('#broken',b,'bad'));
+ const pagesFail=PAGES.filter(p=>docs[p].status!==200).length;
+ const allOk=broken.length===0&&assetFail===0&&pagesFail===0;
+ $('#sum').innerHTML=(allOk?'<span class="ok">ALL CHECKS PASSED</span>':'<span class="bad">FAILURES FOUND</span>')+
+  ` — ${PAGES.length} pages fetched (${pagesFail} bad) · ${totalLinks} internal links + ${totalAnchors} same-page anchors re-verified · ${broken.length} broken · ${shas.size} images sha-verified (${assetFail} mismatched)`;
+ $('#pg').hidden=true;
+};
+</script></body></html>
