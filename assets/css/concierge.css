@@ -1,0 +1,166 @@
+/* ============================================================================
+   ESTATE CONCIERGE — concierge.css
+   A light, readable surface on the dark estate. The one law of this file:
+   NEVER tan-on-tan. Panel body is cream/white with near-black ink; gold is an
+   accent and a button fill only, always carrying dark text (mirrors .btn-gold).
+
+   Measured contrast (WCAG 2.1 relative luminance):
+     #141416 on #FAF7F0  ≈ 17.9:1   (body text on panel)      AAA
+     #141416 on #FFFFFF  ≈ 18.8:1   (body text on cards)      AAA
+     #3D3A33 on #FAF7F0  ≈ 10.9:1   (secondary text)          AAA
+     #141416 on #C8A45C  ≈  8.0:1   (text on gold buttons)    AAA
+     #6E5826 on #FAF7F0  ≈  6.3:1   (links on cream)          AA+ (normal text)
+     #F4F1E9 on #141416  ≈ 16.4:1   (header text on charcoal) AAA
+     #C9C5B9 on #141416  ≈ 10.9:1   (header fine print)       AAA
+   All interactive targets ≥ 44px. Namespaced .cg-* / #cg-* only — no estate
+   selector is touched. Zero network: this file references no external asset;
+   fonts fall back through the estate's already-embedded faces.
+   ========================================================================== */
+
+#cg-launcher,#cg-panel{
+  --cg-cream:#FAF7F0; --cg-card:#FFFFFF; --cg-ink:#141416; --cg-ink2:#3D3A33;
+  --cg-line:#E4DDCE; --cg-line-strong:#B99C58; --cg-gold:#C8A45C;
+  --cg-gold-hi:#E3C57E; --cg-link:#6E5826; --cg-dark:#141416;
+  --cg-dark-ink:#F4F1E9; --cg-dark-ink2:#C9C5B9;
+  --cg-display:'Cormorant Garamond','Times New Roman',serif;
+  --cg-ui:'Inter',-apple-system,'Segoe UI',sans-serif;
+  --cg-dur:200ms;
+  box-sizing:border-box;
+}
+#cg-launcher *,#cg-panel *,#cg-launcher *::before,#cg-panel *::before{box-sizing:border-box}
+@media (prefers-reduced-motion:reduce){
+  #cg-launcher,#cg-panel{--cg-dur:0ms}
+}
+
+/* ---- launcher: gold pill, dark ink, visible label ---------------------- */
+#cg-launcher{
+  position:fixed; right:1.1rem; bottom:1.1rem; z-index:95;
+  display:inline-flex; align-items:center; gap:.5rem;
+  min-height:52px; padding:0 1.35rem; border:0; border-radius:999px;
+  background:var(--cg-gold); color:var(--cg-ink); cursor:pointer;
+  font:600 .9375rem/1 var(--cg-ui); letter-spacing:.05em;
+  box-shadow:0 10px 32px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.35);
+  transition:transform var(--cg-dur) ease, background var(--cg-dur);
+}
+#cg-launcher:hover{background:var(--cg-gold-hi); transform:translateY(-2px)}
+#cg-launcher:focus-visible{outline:3px solid var(--cg-gold-hi); outline-offset:3px}
+#cg-launcher .cg-glyph{font-size:1.05rem; line-height:1}
+/* store page: the estate's own bag pill owns the corner — step above it */
+#cg-launcher.cg-raised{bottom:7.6rem}
+@media (max-width:860px){
+  /* never cover the estate's fixed Call/Text/Book action bar (58px) */
+  #cg-launcher{bottom:calc(58px + .95rem)}
+  #cg-launcher.cg-raised{bottom:calc(58px + 4.9rem)}
+}
+
+/* ---- panel ------------------------------------------------------------- */
+#cg-panel{
+  position:fixed; right:1.1rem; bottom:1.1rem; z-index:118;
+  margin:0; padding:0; text-align:left;
+  width:min(420px, calc(100vw - 2rem));
+  height:min(660px, calc(100dvh - 3.5rem));
+  display:none; flex-direction:column; overflow:hidden;
+  background:var(--cg-cream); color:var(--cg-ink);
+  border:1px solid var(--cg-line-strong); border-radius:2px;
+  box-shadow:0 24px 64px rgba(0,0,0,.6);
+  font:400 1rem/1.6 var(--cg-ui);
+}
+#cg-panel.cg-on{display:flex}
+@media (max-width:640px){
+  #cg-panel{left:0; right:0; bottom:0; top:max(2.4rem, 6dvh); width:auto; height:auto;
+    border-left:0; border-right:0; border-bottom:0}
+}
+
+/* ---- header: charcoal band, cream ink ---------------------------------- */
+.cg-head{background:var(--cg-dark); color:var(--cg-dark-ink); padding:1rem 1.1rem .9rem;
+  border-bottom:2px solid var(--cg-gold); flex:0 0 auto; position:relative}
+.cg-head h2{margin:0; font:500 1.45rem/1.15 var(--cg-display); color:var(--cg-dark-ink)}
+.cg-head h2 em{font-style:italic; color:var(--cg-gold-hi)}
+.cg-head .cg-sub{margin:.15rem 0 0; font:600 .6875rem/1.5 var(--cg-ui);
+  letter-spacing:.14em; text-transform:uppercase; color:var(--cg-gold)}
+.cg-notice{margin:.55rem 0 0; font:400 .8125rem/1.5 var(--cg-ui); color:var(--cg-dark-ink2)}
+.cg-close{position:absolute; top:.7rem; right:.7rem; min-width:44px; min-height:44px;
+  background:none; border:1px solid #3A3A3E; border-radius:2px; color:var(--cg-dark-ink);
+  font:600 .8125rem/1 var(--cg-ui); letter-spacing:.08em; cursor:pointer; padding:.5rem .8rem}
+.cg-close:hover{border-color:var(--cg-gold); color:var(--cg-gold-hi)}
+.cg-close:focus-visible{outline:2px solid var(--cg-gold-hi); outline-offset:2px}
+
+/* ---- conversation ------------------------------------------------------ */
+.cg-log{flex:1 1 auto; overflow-y:auto; padding:1rem 1rem 1.2rem; background:var(--cg-cream);
+  scrollbar-width:thin; scrollbar-color:var(--cg-line-strong) transparent}
+.cg-msg{max-width:100%; margin:0 0 .8rem; border-radius:2px; padding:.8rem 1rem;
+  font-size:1rem; line-height:1.6; overflow-wrap:break-word}
+.cg-msg-bot{background:var(--cg-card); border:1px solid var(--cg-line); color:var(--cg-ink)}
+.cg-msg-user{background:var(--cg-dark); color:var(--cg-dark-ink); margin-left:2.2rem}
+.cg-msg-bot b{color:var(--cg-ink)}
+.cg-msg-bot a{color:var(--cg-link); text-decoration:underline; text-underline-offset:2px}
+.cg-msg-bot a:hover{color:#57451E}
+.cg-msg-bot a:focus-visible{outline:2px solid var(--cg-link); outline-offset:2px}
+.cg-msg-bot .cg-fine{display:block; margin-top:.5rem; font-size:.8125rem; color:var(--cg-ink2)}
+.cg-msg-bot ul{margin:.5rem 0 .2rem; padding-left:1.15rem}
+.cg-msg-bot li{margin:.25rem 0}
+.cg-kv{margin:.55rem 0 .2rem; border-top:1px solid var(--cg-line)}
+.cg-kv div{display:flex; justify-content:space-between; gap:1rem; padding:.42rem 0;
+  border-bottom:1px solid var(--cg-line); font-size:.9375rem}
+.cg-kv b{font:600 .75rem/1.6 var(--cg-ui); letter-spacing:.08em; text-transform:uppercase;
+  color:var(--cg-ink2); white-space:nowrap}
+.cg-kv span{text-align:right; color:var(--cg-ink)}
+
+/* ---- action chips: every answer converts -------------------------------- */
+.cg-chips{display:flex; flex-wrap:wrap; gap:.5rem; margin:.2rem 0 1rem}
+.cg-chip{display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
+  min-height:44px; padding:.5rem 1.05rem; border-radius:999px; cursor:pointer;
+  font:600 .875rem/1.2 var(--cg-ui); letter-spacing:.02em; text-decoration:none;
+  transition:transform var(--cg-dur) ease, background var(--cg-dur), border-color var(--cg-dur)}
+.cg-chip:hover{transform:translateY(-1px)}
+.cg-chip-gold{background:var(--cg-gold); color:var(--cg-ink); border:1px solid var(--cg-gold)}
+.cg-chip-gold:hover{background:var(--cg-gold-hi)}
+.cg-chip-line{background:var(--cg-card); color:var(--cg-ink); border:1px solid var(--cg-line-strong)}
+.cg-chip-line:hover{border-color:#7a5f28}
+.cg-chip:focus-visible{outline:2px solid var(--cg-link); outline-offset:2px}
+
+/* ---- suggested prompts: real buttons, clickable ------------------------- */
+.cg-prompts{display:flex; flex-direction:column; gap:.45rem; margin:.2rem 0 1rem}
+.cg-prompts-label{font:600 .6875rem/1.4 var(--cg-ui); letter-spacing:.14em;
+  text-transform:uppercase; color:var(--cg-ink2); margin:.2rem 0 .1rem}
+.cg-prompt{display:block; width:100%; text-align:left; min-height:44px;
+  background:var(--cg-card); border:1px solid var(--cg-line); border-radius:2px;
+  padding:.6rem .9rem; color:var(--cg-ink); font:400 1rem/1.45 var(--cg-ui); cursor:pointer;
+  transition:border-color var(--cg-dur)}
+.cg-prompt::before{content:'→ '; color:var(--cg-link); font-weight:600}
+.cg-prompt:hover{border-color:var(--cg-gold)}
+.cg-prompt:focus-visible{outline:2px solid var(--cg-link); outline-offset:2px}
+
+/* ---- input row ---------------------------------------------------------- */
+.cg-inputrow{flex:0 0 auto; display:flex; gap:.5rem; padding:.7rem .9rem;
+  background:var(--cg-cream); border-top:1px solid var(--cg-line)}
+.cg-input{flex:1; min-height:46px; background:var(--cg-card); color:var(--cg-ink);
+  border:1px solid var(--cg-line-strong); border-radius:2px; padding:.55rem .85rem;
+  font:400 1rem/1.4 var(--cg-ui)}
+.cg-input::placeholder{color:#5C564A; opacity:1}
+.cg-input:focus{outline:2px solid var(--cg-gold); outline-offset:1px; border-color:var(--cg-gold)}
+.cg-send{min-height:46px; min-width:64px; background:var(--cg-gold); color:var(--cg-ink);
+  border:1px solid var(--cg-gold); border-radius:2px; cursor:pointer;
+  font:600 .9375rem/1 var(--cg-ui); letter-spacing:.04em; padding:0 1rem}
+.cg-send:hover{background:var(--cg-gold-hi)}
+.cg-send:focus-visible{outline:2px solid var(--cg-link); outline-offset:2px}
+
+/* ---- persistent conversion bar: Book + Call, always ---------------------- */
+.cg-bar{flex:0 0 auto; display:grid; grid-template-columns:1fr 1fr; gap:1px;
+  background:#2A2A2E; border-top:1px solid var(--cg-line-strong)}
+.cg-bar a{display:flex; align-items:center; justify-content:center; min-height:50px;
+  font:600 .8125rem/1 var(--cg-ui); letter-spacing:.09em; text-transform:uppercase;
+  text-decoration:none}
+.cg-bar .cg-bar-book{background:var(--cg-gold); color:var(--cg-ink)}
+.cg-bar .cg-bar-book:hover{background:var(--cg-gold-hi)}
+.cg-bar .cg-bar-call{background:var(--cg-dark); color:var(--cg-dark-ink)}
+.cg-bar .cg-bar-call:hover{color:var(--cg-gold-hi)}
+.cg-bar a:focus-visible{outline:2px solid var(--cg-gold-hi); outline-offset:-3px}
+
+/* ---- same-page navigation flash ----------------------------------------- */
+.cg-flash{outline:2px solid #C8A45C !important; outline-offset:6px;
+  transition:outline-color 1.2s ease}
+.cg-flash.cg-flash-fade{outline-color:rgba(200,164,92,0) !important}
+
+/* ---- print: the concierge is a screen tool ------------------------------- */
+@media print{#cg-launcher,#cg-panel{display:none !important}}
